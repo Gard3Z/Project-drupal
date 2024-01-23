@@ -1,0 +1,8 @@
+{
+    "name": "drupal/wishlist",
+    "description": "wishlist desc",
+    "type": "drupal-custom-module",
+    "require": {
+        "fabpot/goutte": "^4.0"
+    }
+}

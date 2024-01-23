@@ -1,0 +1,16 @@
+wishlist.render:
+  path: '/wishlists/create'
+  # Defines the default properties of a route.
+  defaults:
+    # For page callbacks that return a render array use _controller.
+    _controller: '\Drupal\wishlist\Controller\WishlistController::content'
+    _title: Create a wishlist
+  requirements:
+    _permission: 'access content'
+wishlist.popin_scrap_form:
+  path: '/wishlist/popin-scrap'
+  defaults:
+    _title: 'Popin Scrap'
+    _form: 'Drupal\wishlist\Form\PopinScrapForm'
+  requirements:
+    _permission: 'create wishlist_item content'

@@ -1,0 +1,58 @@
+version: "3.8"
+services:
+
+  php:
+    build: ./docker/php
+    container_name: '${PROJECT_NAME}_php'
+    #    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html/
+    depends_on:
+      - mariadb
+    environment:
+      MYSQL_DB_HOST: mariadb
+      MYSQL_DATABASE: $DB_NAME
+      MYSQL_USER: $DB_USER
+      MYSQL_PASSWORD:
+        $DB_PASSWORD
+
+  nginx:
+    image: nginx:latest
+    container_name: '${PROJECT_NAME}_nginx'
+    ports:
+      - 80:80
+    links:
+      - 'php'
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx-conf:/etc/nginx/conf.d
+    depends_on:
+      - php
+
+  # MariaDB Service
+  mariadb:
+    image: mariadb:10.11
+    container_name: '${PROJECT_NAME}_mariadb'
+    environment:
+      MYSQL_ROOT_PASSWORD: $DB_ROOT_PASSWORD
+      MYSQL_DATABASE: $DB_NAME
+      MYSQL_USER: $DB_USER
+      MYSQL_PASSWORD: $DB_PASSWORD
+    volumes:
+      - mysqldata:/var/lib/mysql
+      - ./docker/mariadb/my.cnf:/etc/mysql/conf.d/my.cnf
+
+  # phpMyAdmin Service
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: '${PROJECT_NAME}_pma'
+    ports:
+      - 8080:80
+    environment:
+      PMA_HOST: mariadb
+    depends_on:
+      - mariadb
+
+# Volumes
+volumes:
+  mysqldata:

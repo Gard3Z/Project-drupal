@@ -1,0 +1,174 @@
+<?php
+
+use Drupal\Core\Session\AccountProxy;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\node\Entity\Node;
+
+function wishlist_theme($existing, $type, $theme, $path) {
+  return [
+    'wishlist_custom_template' => [
+        'variables' => ['test_var' => NULL],
+    ],
+    ];
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+
+function wishlist_form_node_wishlist_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id){
+
+    // Nep pas afficher le champ field_wishlist_owner pour les utilisateurs non admin
+    if (!isset($form['field_wishlist_owner']["widget"][0]["target_id"])) {
+        return;
+    }
+
+    // Recupérer l'id de l'utilisateur connecté
+    $accountProxy = \Drupal::currentUser();
+
+    if (in_array('administrator', $accountProxy->getRoles())) {
+        return;
+    }
+    if (!$accountProxy instanceof AccountProxy) {
+        return;
+    }
+    $userId = $accountProxy->getAccountName();
+
+    // Retirer le champ faield_wishlist_owner du formulaire
+    $form["field_wishlist_owner"]["widget"][0]["target_id"]["#access"]= FALSE;
+}
+
+function wishlist_form_node_wishlist_edit_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id){
+
+    // hook pour modifier le formulaire de création de wishlist
+    if (!isset($form['field_wishlist_owner']["widget"][0]["target_id"])) {
+        return;
+    }
+    // Recupérer l'id de l'utilisateur connecté
+    $accountProxy = \Drupal::currentUser();
+
+    // Exclure ce comportement pour l'admin
+    if (in_array('administrator', $accountProxy->getRoles())) {
+        return;
+    }
+    if (!$accountProxy instanceof AccountProxy) {
+        return;
+    }
+
+    // Retirer le champ faield_wishlist_owner du formulaire
+    $form["field_wishlist_owner"]["widget"][0]["target_id"]["#access"]= FALSE;
+
+    // Retirer le champ permettant d'ajouter des revisions au formulaire
+    $form["revision_information"]["#access"]= FALSE;
+}
+
+function wishlist_form_node_wishlist_item_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id){
+
+    // $wid = \Drupal::request()->query->get('wid');
+
+    if (!isset($form['field_linked_wishlist']["widget"][0]["target_id"])) {
+        return;
+    }
+    // Recupérer l'id de l'utilisateur connecté
+    $accountProxy = \Drupal::currentUser();
+
+    // Exclure ce comportement pour l'admin
+    if (in_array('administrator', $accountProxy->getRoles())) {
+        return;
+    }
+    if (!$accountProxy instanceof AccountProxy) {
+        return;
+    }
+
+    $form["field_linked_wishlist"]["widget"][0]["target_id"]["#access"]= FALSE;
+    $wid = \Drupal::request()->query->get('wid');
+    if (empty($wid)) {
+        \Drupal::messenger()->addMessage("Vous ne pouvez pas ajouter d'item à cette liste", 
+        MessengerInterface::TYPE_ERROR
+    );   
+        $redirect = new RedirectResponse("/");
+        return $redirect->send();
+    }
+    else {
+        $wishlist = Node::load($wid);
+        $owner = $wishlist->get('field_wishlist_owner')->target_id;
+        if($accountProxy->id() !== $owner){
+            \Drupal::messenger()->addMessage('Vous ne pouvez pas crée d\'item wishlist si vous n\'avez pas de wishlist', 'error');
+            $redirect = new RedirectResponse('/');
+            return $redirect->send();
+        };
+    }
+}
+
+function wishlist_form_node_wishlist_item_edit_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id){
+
+    // $wid = \Drupal::request()->query->get('wid');
+
+    if (!isset($form['field_linked_wishlist']["widget"][0]["target_id"])) {
+        return;
+    }
+    // Recupérer l'id de l'utilisateur connecté
+    $accountProxy = \Drupal::currentUser();
+
+    // Exclure ce comportement pour l'admin
+    if (in_array('administrator', $accountProxy->getRoles())) {
+        return;
+    }
+    if (!$accountProxy instanceof AccountProxy) {
+        return;
+    }
+
+    $form["field_linked_wishlist"]["widget"][0]["target_id"]["#access"]= FALSE;
+    // Retirer le champ permettant d'ajouter des revisions au formulaire
+    $form["revision_information"]["#access"]= FALSE;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ */
+function wishlist_node_presave(Drupal\Core\Entity\EntityInterface $entity) {
+    if($entity->bundle() === "wishlist"){
+
+        // verifier si le champ field_wishlist_owner existe
+        if ($entity->hasField('field_wishlist_owner')) {
+            return;
+        }
+
+        // Recupérer l'id de l'utilisateur connecté
+        $accountProxy = \Drupal::currentUser();
+        if (!$accountProxy instanceof AccountProxy) {
+            return;
+        }
+        
+        if (in_array('administrator', $accountProxy->getRoles())) {
+            return;
+        }
+        
+        $userId = $accountProxy->getAccountName();
+        $entity->set('field_wishlist_owner', ['target_id' => $userId]);
+    };
+
+    if($entity->bundle() === "wishlist_item"){
+        // verifier si le champ field_wishlist_owner existe
+        if (!$entity->hasField('field_linked_wishlist')) {
+            return;
+        }
+
+        // Recupérer l'id de l'utilisateur connecté
+        $accountProxy = \Drupal::currentUser();
+        if (!$accountProxy instanceof AccountProxy) {
+            return;
+        }
+        
+        if (in_array('administrator', $accountProxy->getRoles())) {
+            return;
+        }
+
+        $wid = \Drupal::request()->query->get('wid');
+        if (!empty($wid)) {
+            $entity->set('field_linked_wishlist', ['target_id' => $wid]);
+        }
+        
+    }
+}

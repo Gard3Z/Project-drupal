@@ -1,0 +1,5 @@
+name: Wishlist
+description: Module contenant le code custom pour la gestion des wishlists.
+package: Custom
+type: module
+core_version_requirement: ^10

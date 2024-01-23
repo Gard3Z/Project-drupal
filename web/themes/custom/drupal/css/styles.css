@@ -1,0 +1,174 @@
+/* VARIABLES */
+:root {
+    --primary : #AFD0BF;
+    --primary-light : #E2EFDE;
+    --primary-extra-light : #F7FDF6;
+    --primary-dark : #808F86;
+    --secondary : #F4B266;
+    --secondary-light : #FFF4E7;
+    --gris-fonce : #575757;
+    --gris-clair : #F2F2F2;
+    --gris-très-clair : #f8f8f8;
+}
+
+
+li>a{
+    text-decoration: none;
+    color: grey;
+}
+
+img{
+    width: 100%;
+    height: auto;
+}
+
+
+/* Menu */
+.menu-header ul.menu li a{
+  display: block;
+  padding: 10px;
+  border: 1px solid black;
+  border-radius: 5px;
+}
+
+.menu-header ul.menu li a:hover{
+  background-color: var(--secondary);
+  color: var(--gris-fonce);
+}
+
+.menu-header.first{
+  border-bottom: 3px solid var(--gris-clair);
+}
+/* --------------------------------- */
+
+/* Version PC */
+@media (min-width: 992px){
+  .menu-header ul.menu li a{
+      border: none;
+
+  }
+
+  .menu-header ul.menu li{
+      display: inline-block;
+  }
+
+  .menu-header.first{
+      border-right: 1px solid var(--gris-clair);
+      border-bottom: none;
+  }
+  .view-id-product_homepage .view-content{
+    flex-direction: row !important;
+  }
+  
+  .view-id-product_homepage .views-row{
+    width: 25%;
+    padding: 10px;
+  }
+}
+/* --------------------------------- */
+
+
+/* Bandeau Page d'accueil */
+.highlighted-wrapper{
+  background: url("../images/bg-head-home.jpg");
+  background-size: cover;
+  padding: 40px 0;
+  margin-bottom: 40px;
+  color: white;
+  text-align: center;
+  position: relative;
+}
+
+.highlighted-wrapper .contextual-region{
+  position: static;
+}
+
+.highlighted-wrapper a{
+  position: absolute;
+  text-decoration: none;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  background-color: #fab768;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+}
+
+.highlighted-wrapper img{
+  width: 5%;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.highlighted-wrapper #barre{
+  border: white 5px solid;
+  background-color: white;
+  width: 5%;
+  height: 5px;
+  margin: 15px auto 15px;
+}
+/* --------------------------------- */ 
+
+
+/* Vue Produits */
+#block-drupal-views-block-product-homepage-block-1>h2{
+  text-align: center;
+}
+
+.view-header{
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.view-header .barre-vue{
+  border: var(--primary-light) 5px solid;
+  background-color: var(--primary-light);
+  width: 5%;
+  height: 5px;
+  margin: 15px auto 15px;
+}
+
+.view-header>p{
+  margin-bottom: 30px;
+}
+
+.view-header a{
+  text-decoration: none;
+  background-color: var(--primary);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+}
+
+.view-id-product_homepage .view-content{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.view-id-product_homepage .views-row{
+  width: 90%;
+  padding: 10px;
+}
+
+#block-drupal-views-block-product-homepage-block-1 .field--name-field-image-product{
+  border: var(--gris-clair) 2px solid;
+  border-radius: 20px;
+  padding: 10px;
+}
+
+.node--type-wishlist-item>h2 span{
+  display: inline-block;
+  font-size: 0.5em;
+  font-weight: lighter;
+  color: var(--gris-fonce);
+  text-decoration: none;
+}
+
+#block-drupal-views-block-product-homepage-block-1 .field--name-field-price{
+  color: var(--gris-fonce);
+  font-weight: bold;
+}
+/* --------------------------------- */
