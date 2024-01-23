@@ -86,18 +86,7 @@
           {{ page.content }}
         </div>{# /.layout-content #}
 
-          {% if page.content_full_wd %}
-        <div class="content_full_wd-wrapper">
-          <div class="container">
-            <div class="row">
-              <div class="col">
-              <img src="/sites/default/files/inline-images/cadeau-coeur-logo.png" alt="logo" class="content_full_wd-wrapper-logo">
-                {{ page.content_full_wd }}
-              </div>
-            </div>
-          </div>
-        </div>
-      {% endif %}
+          
 
         <div class="layout-sidebars-left col-lg order-lg-1">
           {% if page.sidebar_first %}
@@ -116,15 +105,45 @@
         </div>
       </div>
     </div>
+     {% if page.content_full_wd %}
+        <div class="content_full_wd-wrapper">
+          <div class="container">
+            <div class="row">
+              <div class="col">
+                {{ page.content_full_wd }}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      {% if page.last_content %}
+        <div class="last_content-wrapper">
+          <div class="container">
+            <div class="row">
+              <div class="col">
+                {{ page.last_content }}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
   </main>
 
  {% if page.prefooter %}
-    <div role="contentinfo" class="bg-dark text-white">
-      {{ page.prefooter }}
-    </div>
+    <div class="prefooter">
+        <div class="container">
+          <div class="row">
+            <div class="col">
+              {{ page.prefooter }}
+            </div>
+          </div>
+        </div>
+      </div>
   {% endif %}
+
   {% if page.footer %}
-    <footer role="contentinfo" class="bg-dark text-white">
+    <footer role="contentinfo">
       {{ page.footer }}
     </footer>
   {% endif %}
