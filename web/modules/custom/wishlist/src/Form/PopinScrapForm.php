@@ -54,6 +54,8 @@ final class PopinScrapForm extends FormBase {
       ],
     ];
 
+    
+
     return $form;
   }
 
@@ -100,21 +102,34 @@ final class PopinScrapForm extends FormBase {
     $this->messenger()->addStatus($this->t('Ok'));
 
     $url = $form_state->getValue('url');
-
-    // Utilisez la classe ProductScrapper pour extraire les informations de la page
     $scrapper = new ProductScrapper();
     $scrapedData = $scrapper->findProductData($url);
 
-    // Redirigez vers le formulaire de création de nœud en incluant les données extraites
+    // Récupérez le type de contenu wishlist_item.
+    $type = 'wishlist_item';
+
+    // Utilisez l'injection de dépendance pour obtenir le gestionnaire d'entité.
+    $entityFieldManager = \Drupal::service('entity_field.manager');
+
+    // Obtenez les champs du type de contenu wishlist_item.
+    $fields = $entityFieldManager->getFieldDefinitions('node', $type);
+
+    // Parcourez les champs et affichez les noms.
+    foreach ($fields as $fieldName => $field) {
+      \Drupal::logger('wishlist')->notice('Champ : @fieldName', ['@fieldName' => $fieldName]);
+    }
+
+    // Redirigez vers le formulaire de création de nœud en incluant les données extraites.
     $wid = \Drupal::request()->query->get('wid');
     $form_state->setRedirect('node.add', [
-      'node_type' => 'wishlist_item',
+      'node_type' => $type,
       'wid' => $wid,
       'urlToScrap' => $url,
       'scrapedData' => $scrapedData,
+      // ... ajoutez d'autres champs selon vos besoins.
     ]);
 
-    // Pré-remplissez les champs du formulaire
+    // Pré-remplissez les champs du formulaire.
     $form_state->setValue('title', isset($scrapedData['title']) ? $scrapedData['title'] : '');
     $form_state->setValue('field_price', isset($scrapedData['price']) ? $scrapedData['price'] : '');
     $form_state->setValue('field_description', isset($scrapedData['description']) ? $scrapedData['description'] : '');
@@ -124,7 +139,8 @@ final class PopinScrapForm extends FormBase {
     \Drupal::logger('wishlist')->notice('Champ price : @price', ['@price' => $scrapedData['price']]);
     \Drupal::logger('wishlist')->notice('Champ description : @description', ['@description' => $scrapedData['description']]);
     \Drupal::logger('wishlist')->notice('Champ image : @image', ['@image' => $scrapedData['image']]);
-}
+  }
+
 
 
 

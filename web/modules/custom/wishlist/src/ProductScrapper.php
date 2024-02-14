@@ -57,8 +57,16 @@ class ProductScrapper {
    *   Le titre extrait.
    */
   private function findTitle(Crawler $crawler) {
-    return $crawler->filter('#title')->text();
-  }
+    $titleNode = $crawler->filter('#title')->first();
+
+    if ($titleNode->count() > 0) {
+        return $titleNode->text();
+    }
+
+    // Retourne une valeur par défaut si aucun élément n'est trouvé.
+    return 'Titre non disponible';
+}
+
 
   /**
    * Extrait le prix de la page.
