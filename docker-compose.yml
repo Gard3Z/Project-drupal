@@ -2,19 +2,21 @@ version: "3.8"
 services:
 
   php:
-    build: ./docker/php
+    build: ./docker/images/php
     container_name: '${PROJECT_NAME}_php'
     #    working_dir: /var/www/html
     volumes:
       - ./:/var/www/html/
+      - ./docker/conf/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     depends_on:
       - mariadb
     environment:
       MYSQL_DB_HOST: mariadb
       MYSQL_DATABASE: $DB_NAME
       MYSQL_USER: $DB_USER
-      MYSQL_PASSWORD:
-        $DB_PASSWORD
+      MYSQL_PASSWORD: $DB_PASSWORD
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   nginx:
     image: nginx:latest
@@ -25,7 +27,7 @@ services:
       - 'php'
     volumes:
       - ./:/var/www/html
-      - ./docker/nginx-conf:/etc/nginx/conf.d
+      - ./docker/conf/nginx-conf:/etc/nginx/conf.d
     depends_on:
       - php
 
@@ -40,7 +42,7 @@ services:
       MYSQL_PASSWORD: $DB_PASSWORD
     volumes:
       - mysqldata:/var/lib/mysql
-      - ./docker/mariadb/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./docker/conf/mariadb/my.cnf:/etc/mysql/conf.d/my.cnf
 
   # phpMyAdmin Service
   phpmyadmin:
@@ -50,6 +52,7 @@ services:
       - 8080:80
     environment:
       PMA_HOST: mariadb
+      UPLOAD_LIMIT: 500M
     depends_on:
       - mariadb
 

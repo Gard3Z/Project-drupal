@@ -25,7 +25,8 @@
         "drupal/core-project-message": "^10.1",
         "drupal/core-recommended": "^10.1",
         "drupal/pathauto": "^1.12",
-        "drush/drush": "^12.2"
+        "drush/drush": "^12.2",
+        "fabpot/goutte": "*"
     },
     "conflict": {
         "drupal/drupal": "*"

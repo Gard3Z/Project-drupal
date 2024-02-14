@@ -4,5 +4,11 @@
     "type": "drupal-custom-module",
     "require": {
         "fabpot/goutte": "^4.0"
+    },
+
+    "autoload": {
+        "psr-4": {
+            "Drupal\\wishlist\\": "src/"
+        }
     }
 }

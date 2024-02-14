@@ -6,6 +6,8 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\NodeType;
+use Goutte\Client;
+use Drupal\wishlist\ProductScrapper;
 
 /**
  * Provides a Wishlist form.
@@ -75,25 +77,59 @@ final class PopinScrapForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void {
-    // $this->messenger()->addStatus($this->t('The message has been sent.'));
-    // $form_state->setRedirect('<front>');
-  }
+     // Utilisez la classe ProductScrapper pour extraire les informations de la page
+     $url = $form_state->getValue('url');
+     $scrapper = new ProductScrapper();
+     $scrapedData = $scrapper->findProductData($url);
+     
+ 
+     // Redirigez vers le formulaire de création de nœud en incluant les données extraites
+     $wid = \Drupal::request()->query->get('wid');
+     $form_state->setRedirectUrl(Url::fromRoute(
+       'node.add', 
+       ['node_type' => 'wishlist_item'], 
+       ['query' => [
+         'wid' => $wid,
+         'urlToScrap' => $url,
+         'scrapedData' => $scrapedData,
+       ]]
+     ));
+   }
 
-  public function yesScrap(array &$form, FormStateInterface $form_state): void {
+   public function yesScrap(array &$form, FormStateInterface $form_state): void {
     $this->messenger()->addStatus($this->t('Ok'));
 
     $url = $form_state->getValue('url');
 
+    // Utilisez la classe ProductScrapper pour extraire les informations de la page
+    $scrapper = new ProductScrapper();
+    $scrapedData = $scrapper->findProductData($url);
+
+    // Redirigez vers le formulaire de création de nœud en incluant les données extraites
     $wid = \Drupal::request()->query->get('wid');
-    $form_state->setRedirectUrl(Url::fromRoute(
-      'node.add', 
-      ['node_type' => 'wishlist_item'], 
-      ['query' => [
-        'wid' => $wid,
-        'urlToScrap' => $url,
-        ]]
-    ));
-  }
+    $form_state->setRedirect('node.add', [
+      'node_type' => 'wishlist_item',
+      'wid' => $wid,
+      'urlToScrap' => $url,
+      'scrapedData' => $scrapedData,
+    ]);
+
+    // Pré-remplissez les champs du formulaire
+    $form_state->setValue('title', isset($scrapedData['title']) ? $scrapedData['title'] : '');
+    $form_state->setValue('field_price', isset($scrapedData['price']) ? $scrapedData['price'] : '');
+    $form_state->setValue('field_description', isset($scrapedData['description']) ? $scrapedData['description'] : '');
+    $form_state->setValue('field_image_product', isset($scrapedData['image']) ? $scrapedData['image'] : '');
+
+    \Drupal::logger('wishlist')->notice('Champ title : @title', ['@title' => $scrapedData['title']]);
+    \Drupal::logger('wishlist')->notice('Champ price : @price', ['@price' => $scrapedData['price']]);
+    \Drupal::logger('wishlist')->notice('Champ description : @description', ['@description' => $scrapedData['description']]);
+    \Drupal::logger('wishlist')->notice('Champ image : @image', ['@image' => $scrapedData['image']]);
+}
+
+
+
+
+
 
   public function noScrap(array &$form, FormStateInterface $form_state): void {
     $this->messenger()->addStatus($this->t('NOT Ok'));
