@@ -143,10 +143,6 @@ final class PopinScrapForm extends FormBase {
 
 
 
-
-
-
-
   public function noScrap(array &$form, FormStateInterface $form_state): void {
     $this->messenger()->addStatus($this->t('NOT Ok'));
 
